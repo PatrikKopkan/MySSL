@@ -76,6 +76,8 @@ privkey = RSA.import_key(crypto.dump_privatekey(crypto.FILETYPE_PEM, privkey))
 cipher_rsa = PKCS1_OAEP.new(privkey)
 session_key = cipher_rsa.decrypt(enc_session_key)
 
+
+
 while True:
     msg = handle_message(s)
     if msg:
@@ -84,3 +86,11 @@ while True:
         cipher = AES.new(session_key, AES.MODE_EAX, nonce)
         data = cipher.decrypt_and_verify(ciphertext, tag)
         print(data.decode())
+
+    data = input("Enter message: ")
+    if data:
+        cipher = AES.new(session_key, AES.MODE_EAX)
+        ciphertext, tag = cipher.encrypt_and_digest(data.encode())
+
+        send(s, cipher.nonce + tag + ciphertext)
+        cipher = AES.new(session_key, AES.MODE_EAX)

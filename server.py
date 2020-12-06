@@ -92,6 +92,11 @@ while True:
         send(clientsocket, cipher.nonce + tag + ciphertext)
         cipher = AES.new(session_key, AES.MODE_EAX)
 
-
+    msg = handle_message(clientsocket)
+    if msg:
+        nonce, tag, ciphertext = msg[0:16], msg[16:32], msg[32:]
+        decipher = AES.new(session_key, AES.MODE_EAX, nonce)
+        data = decipher.decrypt_and_verify(ciphertext, tag)
+        print(data.decode())
 
 
